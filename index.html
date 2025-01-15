@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Sprite Animation</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      background-color: #282c34;
+    }
+    canvas {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+  <canvas id="animationCanvas"></canvas>
+
+  <script>
+    const canvas = document.getElementById('animationCanvas');
+    const ctx = canvas.getContext('2d');
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    const spriteSheet = new Image();
+    spriteSheet.src = 'resources/sprite_sheet_2_c.png';
+
+    const SPRITE_WIDTH = 300;
+    const SPRITE_HEIGHT = 650;
+    const SPRITE_COLUMNS = 16; // Number of columns in the sprite sheet
+    const SPRITE_ROWS = 5; // Number of rows in the sprite sheet
+
+    let currentRow = 0; // Initial row of the animation
+    let currentColumn = 0; // Initial column of the animation
+    let frameCount = 0; // To control frame rate
+    const framesPerAnimation = 3; // Adjust for slower or faster animation
+
+    function drawFrame() {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      // Calculate the position of the sprite in the sheet
+      const sx = currentColumn * SPRITE_WIDTH;
+      const sy = currentRow * SPRITE_HEIGHT;
+
+      // Draw the sprite
+      ctx.drawImage(
+        spriteSheet, 
+        sx, sy, 
+        SPRITE_WIDTH, SPRITE_HEIGHT, 
+        (canvas.width - SPRITE_WIDTH) / 2, 
+        (canvas.height - SPRITE_HEIGHT) / 2, 
+        SPRITE_WIDTH, SPRITE_HEIGHT
+      );
+
+      // Update frame count
+      frameCount++;
+      if (frameCount % framesPerAnimation === 0) {
+        currentColumn = (currentColumn + 1) % SPRITE_COLUMNS;
+
+        //if (currentColumn === 0) {
+        //  currentRow = (currentRow + 1) % SPRITE_ROWS;
+        //}
+      }
+
+      requestAnimationFrame(drawFrame);
+    }
+
+    // Change animation row on click
+    window.addEventListener('click', () => {
+      currentRow = (currentRow + 1) % SPRITE_ROWS;
+      currentColumn = 0; // Reset to the first frame of the new animation
+    });
+
+    spriteSheet.onload = () => {
+      drawFrame();
+    };
+  </script>
+</body>
+</html>
