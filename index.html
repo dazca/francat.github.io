@@ -3,83 +3,429 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Sprite Animation</title>
+  <title>FRAN</title>
   <style>
     body {
       margin: 0;
       overflow: hidden;
       display: flex;
-      justify-content: center;
+      flex-direction: column;
+      justify-content: space-between;
       align-items: center;
       background-color: #282c34;
+      height: 100vh; /* Ensure full viewport height */
     }
     canvas {
+      flex: 1; /* Allow canvas to fill available space */
       display: block;
+      background-color: transparent;
     }
+    #buttonContainer {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      align-items: center;
+      background-color: rgba(0, 0, 0, 0.0);
+      width: 100%;
+      padding: 10px 0;
+    }
+    .buttonRow {
+      display: flex;
+      gap: 5px;
+    }
+    .toggleButton {
+      width: 50px;
+      height: 50px;
+      background-color: #444;
+      border: 2px solid #888;
+      border-radius: 5px;
+      color: white;
+      font-size: 18px;
+      cursor: pointer;
+      text-align: center;
+      line-height: 46px;
+    }
+    .toggleButton.active {
+      background-color: #61dafb;
+      border-color: #61dafb;
+    }
+
+
+    #overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      visibility: hidden;
+      z-index: 9999;
+      transition: background 0.5s ease-in-out;
+      opacity: 0.3;  /* Transparency */
+    }
+
+
+    /* #thermometerBar {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 10px;
+      visibility: hidden;
+    } */
+
+    /* .thermometer {
+      width: 20px;
+      height: 30px;
+      background-color: #ccc;
+      border: 1px solid #666;
+      border-radius: 5px;
+    }
+
+    .thermometer.filled {
+      background-color: green;
+    } */
+
   </style>
 </head>
 <body>
+  <div id="overlay"></div>
   <canvas id="animationCanvas"></canvas>
+  <!-- <div id="thermometerBar">
+    <div class="thermometer" id="thermometer1"></div>
+    <div class="thermometer" id="thermometer2"></div>
+    <div class="thermometer" id="thermometer3"></div>
+    <div class="thermometer" id="thermometer4"></div>
+    <div class="thermometer" id="thermometer5"></div>
+    <div class="thermometer" id="thermometer6"></div>
+    <div class="thermometer" id="thermometer7"></div>
+  </div> -->
+  <div id="buttonContainer">
+    <div class="buttonRow">
+      <button class="toggleButton" id="rythm1">1</button>
+      <button class="toggleButton" id="rythm2">2</button>
+      <button class="toggleButton" id="rythm3">3</button>
+      <button class="toggleButton" id="rythm4">4</button>
+      <button class="toggleButton" id="rythm5">5</button>
+      <button class="toggleButton" id="rythm6">6</button>
+      <button class="toggleButton" id="rythm7">7</button>
+      <button class="toggleButton" id="rythm8">8</button>
+      <button class="toggleButton" id="rythm9">9</button>
+      <button class="toggleButton" id="rythm10">10</button>
+      <button class="toggleButton" id="rythm11">11</button>
+      <button class="toggleButton" id="rythm12">12</button>
+      <button class="toggleButton" id="rythm13">13</button>
+      <button class="toggleButton" id="rythm14">14</button>
+      <button class="toggleButton" id="rythm15">15</button>
+    </div>
+    <div class="buttonRow">
+      <button class="toggleButton" id="rythm16">16</button>
+      <button class="toggleButton" id="rythm17">17</button>
+      <button class="toggleButton" id="rythm18">18</button>
+      <button class="toggleButton" id="rythm19">19</button>
+      <button class="toggleButton" id="rythm20">20</button>
+      <button class="toggleButton" id="rythm21">21</button>
+      <button class="toggleButton" id="rythm22">22</button>
+      <button class="toggleButton" id="rythm23">23</button>
+      <button class="toggleButton" id="rythm24">24</button>
+      <button class="toggleButton" id="rythm25">25</button>
+      <button class="toggleButton" id="rythm26">26</button>
+      <button class="toggleButton" id="rythm27">27</button>
+      <button class="toggleButton" id="rythm28">28</button>
+      <button class="toggleButton" id="rythm29">29</button>
+      <button class="toggleButton" id="rythm30">30</button>
+    </div>
+  </div>
+
+  <script type="module">
+// overlayToggle.js
+
+let overlay, clickTimer, lastShakeTime, colorChangeInterval, isOverlayActive;
+
+// Initialize the script
+export function initOverlayToggle(overlayElementId) {
+  overlay = document.getElementById(overlayElementId);
+  lastShakeTime = 0;
+  isOverlayActive = false;
+
+  // Detect phone shake (using DeviceMotionEvent)
+  window.addEventListener('devicemotion', handleShake);
+
+  // Detect mousedown for 2 seconds
+  document.body.addEventListener('mousedown', handleMouseDown);
+  document.body.addEventListener('mouseup', handleMouseUp);
+}
+
+function handleShake(event) {
+  const currentTime = Date.now();
+  const shakeThreshold = 15; // Adjust for sensitivity
+  const timeBetweenShakes = 1000; // Minimum time between shakes (1 second)
+
+  const acceleration = event.accelerationIncludingGravity;
+  const shakeMagnitude = Math.sqrt(acceleration.x ** 2 + acceleration.y ** 2 + acceleration.z ** 2);
+
+  if (shakeMagnitude > shakeThreshold && currentTime - lastShakeTime > timeBetweenShakes) {
+    lastShakeTime = currentTime;
+    toggleOverlay();
+  }
+}
+
+function handleMouseDown() {
+  if (clickTimer) clearTimeout(clickTimer);
+  clickTimer = setTimeout(() => {
+    toggleOverlay();
+  }, 2000); // 2 seconds delay
+}
+
+function handleMouseUp() {
+  if (clickTimer) clearTimeout(clickTimer);
+}
+
+function toggleOverlay() {
+  if (overlay.style.visibility === 'hidden' || !overlay.style.visibility) {
+    overlay.style.visibility = 'visible';
+    startColorChange();
+  } else {
+    overlay.style.visibility = 'hidden';
+    // Keep color changes active even when hidden
+  }
+}
+
+function startColorChange() {
+  if (!isOverlayActive) {
+    isOverlayActive = true;
+    colorChangeInterval = setInterval(changeOverlayColor, 1000);
+  }
+}
+
+function changeOverlayColor() {
+  const activeColor = getRandomColor();
+  overlay.style.backgroundColor = activeColor;
+}
+
+function getRandomColor() {
+  const colors = [
+    'red', 'green', 'blue',
+    'yellow', 'cyan', 'magenta',
+    'orange', 'pink', 'purple',
+    'lightgreen', 'lightblue', 'lightyellow', 'lightcyan', 'lightmagenta',
+    'lime', 'chartreuse', 'deepskyblue', 'dodgerblue', 'crimson'
+  ];
+  const randomIndex = Math.floor(Math.random() * colors.length);
+  return colors[randomIndex];
+}
+    // Rest of your script...
+    initOverlayToggle('overlay');
+  </script>
 
   <script>
     const canvas = document.getElementById('animationCanvas');
     const ctx = canvas.getContext('2d');
 
+    // Adjust canvas size
     canvas.width = window.innerWidth;
-    canvas.height = window.innerHeight;
+    canvas.height = window.innerHeight * 0.8; // Reserve space for buttons
 
     const spriteSheet = new Image();
     spriteSheet.src = 'resources/sprite_sheet_2_c.png';
 
     const SPRITE_WIDTH = 300;
     const SPRITE_HEIGHT = 650;
-    const SPRITE_COLUMNS = 16; // Number of columns in the sprite sheet
-    const SPRITE_ROWS = 5; // Number of rows in the sprite sheet
+    const SPRITE_COLUMNS = 16;
+    const SPRITE_ROWS = 5;
 
-    let currentRow = 0; // Initial row of the animation
-    let currentColumn = 0; // Initial column of the animation
-    let frameCount = 0; // To control frame rate
-    const framesPerAnimation = 3; // Adjust for slower or faster animation
+    let currentRow = 0;
+    let currentColumn = 0;
+    let frameCount = 0;
+    const framesPerAnimation = 3;
+  // Constants to define keyframes
+  const validKeyframes = [0];
+  // Queue to track sounds waiting for keyframes
+  const soundQueue = new Set();
 
-    function drawFrame() {
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+  // Function to move frames and handle keyframe events
+  function drawFrame() {
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
 
-      // Calculate the position of the sprite in the sheet
-      const sx = currentColumn * SPRITE_WIDTH;
-      const sy = currentRow * SPRITE_HEIGHT;
+    const sx = currentColumn * SPRITE_WIDTH;
+    const sy = currentRow * SPRITE_HEIGHT;
 
-      // Draw the sprite
-      ctx.drawImage(
-        spriteSheet, 
-        sx, sy, 
-        SPRITE_WIDTH, SPRITE_HEIGHT, 
-        (canvas.width - SPRITE_WIDTH) / 2, 
-        (canvas.height - SPRITE_HEIGHT) / 2, 
-        SPRITE_WIDTH, SPRITE_HEIGHT
-      );
+    ctx.drawImage(
+      spriteSheet,
+      sx,
+      sy,
+      SPRITE_WIDTH,
+      SPRITE_HEIGHT,
+      (canvas.width - SPRITE_WIDTH) / 2,
+      (canvas.height - SPRITE_HEIGHT) / 2,
+      SPRITE_WIDTH,
+      SPRITE_HEIGHT
+    );
 
-      // Update frame count
-      frameCount++;
-      if (frameCount % framesPerAnimation === 0) {
-        currentColumn = (currentColumn + 1) % SPRITE_COLUMNS;
+    frameCount++;
+    const currentFramePosition = frameCount % framesPerAnimation;
 
-        //if (currentColumn === 0) {
-        //  currentRow = (currentRow + 1) % SPRITE_ROWS;
-        //}
-      }
-
-      requestAnimationFrame(drawFrame);
+    if (frameCount % framesPerAnimation === 0) {
+      currentColumn = (currentColumn + 1) % SPRITE_COLUMNS;
     }
 
-    // Change animation row on click
-    window.addEventListener('click', () => {
-      currentRow = (currentRow + 1) % SPRITE_ROWS;
-      currentColumn = 0; // Reset to the first frame of the new animation
+    // Check if current frame matches a valid keyframe
+    if (validKeyframes.includes(currentColumn)) {
+      // Play all sounds in the queue
+      soundQueue.forEach((soundKey) => {
+        if (sounds[soundKey].paused) {
+          sounds[soundKey].currentTime = 0; // Reset sound
+          sounds[soundKey].play();
+          console.log(`Playing queued sound: ${soundKey}`);
+        }
+      });
+    } else {
+      // Play all sounds in the queue
+      soundQueue.forEach((soundKey) => {
+        if (sounds[soundKey].paused) {
+          console.log(`Found sound ${soundKey} wants to be played, but waiting since weare on keyframe ${currentFramePosition}`)
+        }
+      });
+    }
+
+    requestAnimationFrame(drawFrame);
+  }
+
+
+  // Start the frame animation
+
+    window.addEventListener('click', (event) => {
+      if (!event.target.classList.contains('toggleButton')) {
+        currentRow = (currentRow + 1) % SPRITE_ROWS;
+        //currentColumn = 0;
+      }
     });
 
     spriteSheet.onload = () => {
       drawFrame();
     };
+
+    // Map button IDs to their corresponding audio files
+    const sounds = {
+      // Pack 1: d
+      rythm1: new Audio('resources/rythm/d_1.wav'),
+      rythm2: new Audio('resources/rythm/d_2.wav'),
+      rythm3: new Audio('resources/rythm/d_3.wav'),
+      rythm16: new Audio('resources/rythm/d_4.wav'),
+      rythm17: new Audio('resources/rythm/d_5.wav'),
+      
+      // Pack 3: e
+      rythm4: new Audio('resources/rythm/e_1.wav'),
+      rythm5: new Audio('resources/rythm/e_2.wav'),
+      rythm6: new Audio('resources/rythm/e_3.wav'),
+      rythm18: new Audio('resources/rythm/e_4.wav'),
+      rythm19: new Audio('resources/rythm/e_5.wav'),
+      rythm20: new Audio('resources/rythm/e_6.wav'),
+      rythm21: new Audio('resources/rythm/e_7.wav'),
+
+      // Pack 5: m
+      rythm22: new Audio('resources/rythm/m_1.wav'),
+      rythm23: new Audio('resources/rythm/m_2.wav'),
+      rythm7: new Audio('resources/rythm/m_3.wav'),
+      rythm8: new Audio('resources/rythm/m_4.wav'),
+      rythm9: new Audio('resources/rythm/m_5.wav'),
+      rythm24: new Audio('resources/rythm/m_6.wav'),
+
+      // Pack 7: v
+      rythm25: new Audio('resources/rythm/v_1.wav'),
+      rythm26: new Audio('resources/rythm/v_2.wav'),
+      rythm10: new Audio('resources/rythm/v_3.wav'),
+      rythm11: new Audio('resources/rythm/v_4.wav'),
+      rythm12: new Audio('resources/rythm/v_5.wav'),
+      rythm27: new Audio('resources/rythm/v_6.wav'),
+      rythm28: new Audio('resources/rythm/v_7.wav'),
+      rythm13: new Audio('resources/rythm/v_8.wav'),
+      
+      // Pack 10: b
+      rythm14: new Audio('resources/rythm/b_1.wav'),
+      rythm29: new Audio('resources/rythm/b_2.wav'),
+      rythm30: new Audio('resources/rythm/b_3.wav'),
+
+      // Pack 11: a
+      rythm15: new Audio('resources/rythm/a.wav'),
+    };
+
+  Object.values(sounds).forEach((sound) => {
+    sound.preload = 'auto';
+    sound.volume = 0.5; // Set a default volume
+    sound.oncanplaythrough = () => {
+      console.log(`Sound loaded: ${sound.src}`);
+    };
+    sound.onerror = (error) => {
+      console.error(`Error loading sound: ${sound.src}`, error);
+    };
+  });
+
+
+// Initialize thermometer state
+let filledThermometers = 0;
+const maxThermometers = 7;
+const thermometerElements = document.querySelectorAll('.thermometer');
+
+// Function to toggle buttons and handle audio
+const toggleButtons = () => {
+  document.querySelectorAll('.toggleButton').forEach((button, index) => {
+    button.addEventListener('click', () => {
+      const isActive = button.classList.toggle('active');
+      const soundKey = `rythm${button.innerText}`;
+
+      // Handle button activation/deactivation based on space
+      if (filledThermometers >= maxThermometers && !isActive) {
+        return; // Prevent deactivation if all thermometers are filled
+      }
+
+      if (isActive && filledThermometers < maxThermometers) {
+        // Add a "filled" thermometer
+        // thermometerElements[filledThermometers].classList.add('filled');
+        filledThermometers++;
+      } else if (!isActive && filledThermometers > 0) {
+        // Remove a "filled" thermometer when deactivated
+        filledThermometers--;
+        // thermometerElements[filledThermometers].classList.remove('filled');
+      }
+
+      // Disable all buttons if max limit is reached
+      if (filledThermometers >= maxThermometers) {
+        document.querySelectorAll('.toggleButton').forEach(button => {
+          if (!button.classList.contains('active')) {
+            button.disabled = true;
+          }
+        });
+      } else {
+        // Enable all buttons again if space is freed
+        document.querySelectorAll('.toggleButton').forEach(button => {
+          button.disabled = false;
+        });
+      }
+
+      if (!sounds[soundKey]) {
+        console.error(`Sound for Button ${index + 1} not found.`);
+        return;
+      }
+
+      if (isActive) {
+        // Add sound to the queue to wait for the next valid keyframe
+        soundQueue.add(soundKey);
+        sounds[soundKey].loop = true; // Ensure looping is enabled
+        console.log(`Button ${index + 1} activated, sound queued.`);
+      } else {
+        // Remove sound from the queue and stop it
+        soundQueue.delete(soundKey);
+        sounds[soundKey].pause();
+        sounds[soundKey].loop = false;
+        console.log(`Button ${index + 1} deactivated, sound stopped.`);
+      }
+    });
+  });
+};
+
+  // Call toggleButtons to set up event listeners
+  toggleButtons();
+
+    // Initialize the overlay functionality
+    initOverlayToggle('overlay');
   </script>
 </body>
 </html>
