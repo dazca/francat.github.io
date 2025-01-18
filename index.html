@@ -300,7 +300,16 @@ function getRandomColor() {
 
     spriteSheet.onload = () => {
       drawFrame();
+      // Call the resizeCanvas function when the page loads
+      resizeCanvas();
     };
+// Set canvas size based on the window's dimensions
+function resizeCanvas() {
+  const buttonContainer = document.querySelector('.button-container');  // Get the button container
+  canvas.width = window.innerWidth;
+  canvas.height = window.innerHeight - buttonContainer.innerHeight;
+}
+
 
     // Map button IDs to their corresponding audio files
     const sounds = {
