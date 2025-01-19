@@ -381,9 +381,9 @@ const toggleButtons = () => {
       const soundKey = `rythm${button.innerText}`;
 
       // Handle button activation/deactivation based on space
-      if (filledThermometers >= maxThermometers && !isActive) {
-        return; // Prevent deactivation if all thermometers are filled
-      }
+      //if (filledThermometers >= maxThermometers && !isActive) {
+       // return; // Prevent deactivation if all thermometers are filled
+      //}
 
       if (isActive && filledThermometers < maxThermometers) {
         // Add a "filled" thermometer
@@ -435,6 +435,7 @@ const toggleButtons = () => {
 
     // Initialize the overlay functionality
     initOverlayToggle('overlay');
+    window.addEventListener('resize', resizeCanvas);
   </script>
 </body>
 </html>
